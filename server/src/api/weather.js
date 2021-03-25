@@ -1,20 +1,37 @@
 const express = require('express');
 const router = express.Router();
+const axios = require('axios');
 
 const city_id = 2950158;
 
 const BASE_URL = 'https://api.openweathermap.org/data/2.5/weather?'
+let cacheData;
+let cacheTime;
+
 
 //READ- all
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
+    // in memory cache
+    if(cacheTime && cacheTime > Date.now() - 30 * 1000) {
+        return res.json(cacheData);
+    }
+    
+    try {    
     const params = new URLSearchParams({
         id: city_id,
+        units:'metric',
         appid: process.env.WEATHER_API_TOKEN,
     });
 
-    res.json({
-        message: 'Hello World',
-    });
+    const { data } = await axios.get(`${BASE_URL}${params}`);
+    cacheData = data;
+    cacheTime = Date.now();
+    data.cacheTime = cacheTime;
+    
+    return res.json(data);
+    } catch (error) {
+        return next(error);
+    }
 });
 
 //READ- one
