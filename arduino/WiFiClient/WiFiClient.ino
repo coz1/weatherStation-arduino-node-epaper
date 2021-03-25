@@ -3,7 +3,7 @@
 #include <ArduinoJson.h>
 
 const char* ssid = "ozt-wireless";
-const char* password = "Zelihacihan1";
+const char* password = "********";
 
 void setup()
 {
